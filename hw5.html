@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW 5.1 - Illinois Building Inventory Visualizations</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <style>
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.7;
+            color: #333;
+            background: #fafafa;
+        }
+        h1 { font-size: 1.8em; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h2 { font-size: 1.3em; margin-top: 40px; color: #444; }
+        p { text-align: justify; margin-bottom: 1em; }
+        .viz-container { 
+            margin: 30px 0; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        .buttons {
+            margin: 30px 0;
+            display: flex;
+            gap: 12px;
+        }
+        .buttons a {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #2c5282;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        .buttons a:hover { background: #1a365d; }
+    </style>
+</head>
+<body>
+
+<h1>HW 5.1 - Illinois Building Inventory Visualizations</h1>
+<p><strong>Author:</strong> Harsha Sekar &nbsp;|&nbsp; <strong>Course:</strong> IS 445 - Data Visualization &nbsp;|&nbsp; <strong>Dataset:</strong> Illinois Building Inventory</p>
+
+<div class="buttons">
+    <a href="https://raw.githubusercontent.com/UIUC-iSchool-DataViz/is445_data/main/building_inventory.csv">The Data</a>
+    <a href="https://github.com/harshvardhan-sekar/harshvardhan-sekar.github.io/blob/main/Homework5.1.ipynb">The Analysis</a>
+</div>
+
+<h2>Visualization 1 - Total Square Footage by Agency (Interactive)</h2>
+
+<div class="viz-container" id="vis1"></div>
+
+<p>
+The first visualization is a horizontal bar chart that displays the total square footage managed by the top 10 Illinois state agencies, colored by building usage type. The y-axis uses a nominal encoding for Agency Name, sorted in descending order by total square footage, which immediately reveals that the University of Illinois controls far more building space than any other agency. The x-axis encodes the sum of square footage as a quantitative variable. The color channel maps Usage Description to a Category10 qualitative color scheme. I chose this scheme because the usage types (Education, Storage, Health Care, Detention, etc.) are categorical with no inherent ordering, so a qualitative palette ensures each category is visually distinct without implying a ranking.
+</p>
+
+<p>
+On the data transformation side, I filtered out rows with missing square footage values since they would not contribute to the aggregation. I then computed total square footage per agency, identified the top 10 agencies, and subset the dataframe to only include those agencies. Displaying all 35 agencies would have made the chart cluttered and difficult to read. The interactive element in this visualization is a dropdown selector that allows the viewer to filter the entire chart by building usage type. By selecting "Education," for example, the viewer can immediately see that universities dominate the square footage, while selecting "Detention &amp; Correc" reveals the Department of Corrections leading by a wide margin. This filtering interaction transforms a single static aggregation into an explorable tool that lets the viewer compare how different agencies allocate space across different usage categories.
+</p>
+
+<h2>Visualization 2 - Building Count by County and Usage Type</h2>
+
+<div class="viz-container" id="vis2"></div>
+
+<p>
+The second visualization is a heatmap that shows the distribution of government buildings across the top 15 Illinois counties, broken down by usage type. The x-axis encodes Usage Description as a nominal variable and the y-axis encodes County as a nominal variable, sorted in descending order by total building count. The color intensity of each cell encodes the count of buildings for that county-usage combination as a quantitative variable. I chose the Greens sequential color scheme because it naturally conveys magnitude from low (light) to high (dark) and is intuitive for count data where we want to quickly spot the densest concentrations without implying any categorical distinction.
+</p>
+
+<p>
+For data transformations, I filtered the dataset to only include the top 15 counties by total building count. The full dataset contains 102 unique counties and displaying all of them would make the heatmap unreadable with most cells being sparse. By focusing on the top 15, we retain a large portion of the data (4,322 out of 8,862 buildings) while keeping the chart clean enough to identify patterns. The heatmap reveals some interesting geographic patterns. Cook County (Chicago) is dominated by Health Care buildings (173), reflecting its role as a major medical hub, while being absent in categories like Detention &amp; Correc. Jackson and Randolph counties are spread across nearly all usage types (11 out of 12 each), with Jackson showing strong concentrations in Storage and Unusual buildings, while Randolph is dominated by Industrial buildings (150), supported by a significant Storage presence (63). Sangamon County, home to the state capital, shows its highest concentration in Storage (172) and Business (79), consistent with the administrative infrastructure needs of state government.
+</p>
+
+<script>
+    fetch("chart1.json")
+        .then(res => res.json())
+        .then(spec => vegaEmbed("#vis1", spec, {actions: true}));
+    fetch("chart2.json")
+        .then(res => res.json())
+        .then(spec => vegaEmbed("#vis2", spec, {actions: true}));
+</script>
+
+</body>
+</html>
